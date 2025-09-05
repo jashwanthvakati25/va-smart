@@ -8,18 +8,12 @@ let reconnectInterval;
 // --- Speak Function (Normal male voice) ---
 function speak(text) {
     let msg = new SpeechSynthesisUtterance(text);
-
     let voices = window.speechSynthesis.getVoices();
-    // Pick a normal English male voice if available
     msg.voice = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('male')) || voices[0];
-
-    msg.rate = 1;   // normal speed
-    msg.pitch = 1;  // normal pitch
+    msg.rate = 1;
+    msg.pitch = 1;
     msg.volume = 1;
-
-    // Natural speech without ellipses
     msg.text = text;
-
     window.speechSynthesis.speak(msg);
 }
 
@@ -110,9 +104,9 @@ function handleDisconnect() {
 
 // --- Emergency Function (opens dialer on mobile) ---
 function callEmergency() {
-    let caretakerNumber = "584782659"; // remove spaces for tel: scheme
+    let caretakerNumber = "584782659";
     speak("Calling your caretaker.");
-    window.location.href = `tel:${caretakerNumber}`; // opens phone dialer
+    window.location.href = `tel:${caretakerNumber}`;
 }
 
 // --- Location Feature ---
