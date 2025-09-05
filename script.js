@@ -5,20 +5,20 @@ let connectBtn;
 let device, obstacleChar;
 let reconnectInterval;
 
-// --- Speak Function (Jarvis-style voice) ---
+// --- Speak Function (Normal male voice) ---
 function speak(text) {
     let msg = new SpeechSynthesisUtterance(text);
 
     let voices = window.speechSynthesis.getVoices();
-    // Pick a deep male voice for Jarvis feel if available
+    // Pick a normal English male voice if available
     msg.voice = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('male')) || voices[0];
 
-    msg.rate = 0.85;   // slower for calm, deliberate tone
-    msg.pitch = 0.4;   // deep, resonant
+    msg.rate = 1;   // normal speed
+    msg.pitch = 1;  // normal pitch
     msg.volume = 1;
 
-    // Slightly robotic effect: pauses after punctuation
-    msg.text = text.replace(/([.?!])/g, "$1…");
+    // Natural speech without ellipses
+    msg.text = text;
 
     window.speechSynthesis.speak(msg);
 }
@@ -115,6 +115,23 @@ function callEmergency() {
     window.location.href = `tel:${caretakerNumber}`; // opens phone dialer
 }
 
+// --- Location Feature ---
+function tellLocationAndNearby() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            let lat = position.coords.latitude;
+            let lon = position.coords.longitude;
+            speak(`Your current location is latitude ${lat.toFixed(3)}, longitude ${lon.toFixed(3)}. Opening nearby hospitals on Google Maps.`);
+            window.open(`https://www.google.com/maps/search/hospitals/@${lat},${lon},15z`);
+        }, error => {
+            console.error(error);
+            speak("Sorry, I couldn't get your location.");
+        });
+    } else {
+        speak("Geolocation is not supported by your browser.");
+    }
+}
+
 // --- Add Connect Arduino Button Listener ---
 window.addEventListener("DOMContentLoaded", () => {
     connectBtn = document.getElementById("connectBtn");
@@ -133,7 +150,7 @@ function takeCommand(message) {
         connectArduino();
     }
     else if (message.includes("emergency") || message.includes("help")) callEmergency();
-    else if (message.includes("location") || message.includes("nearby")) tellLocationAndNearby(); // if you re-add location feature
+    else if (message.includes("location") || message.includes("nearby")) tellLocationAndNearby();
     else {
         let varSearch = "https://www.google.com/search?q=" + message;
         speak("Here is what I found on the web regarding your query.");
