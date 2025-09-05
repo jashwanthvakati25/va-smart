@@ -120,10 +120,22 @@ function tellLocationAndNearby() {
         }, error => {
             console.error(error);
             speak("Sorry, I couldn't get your location.");
+        }, {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: 0
         });
     } else {
         speak("Geolocation is not supported by your browser.");
     }
+}
+
+// --- Go to Home Function ---
+function goHome() {
+    speak("Location set to home.");
+    const homeLat = 24.663583; // 24°39'48.9"N
+    const homeLon = 46.7065;   // 46°42'23.4"E
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${homeLat},${homeLon}`);
 }
 
 // --- Add Connect Arduino Button Listener ---
@@ -145,6 +157,7 @@ function takeCommand(message) {
     }
     else if (message.includes("emergency") || message.includes("help")) callEmergency();
     else if (message.includes("location") || message.includes("nearby")) tellLocationAndNearby();
+    else if (message.includes("home")) goHome();
     else {
         let varSearch = "https://www.google.com/search?q=" + message;
         speak("Here is what I found on the web regarding your query.");
