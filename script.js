@@ -5,14 +5,16 @@ let connectBtn;
 let device, obstacleChar;
 let reconnectInterval;
 
-// --- Speak Function (Male voice) ---
+// --- Speak Function (Deeper male voice) ---
 function speak(text) {
     let msg = new SpeechSynthesisUtterance(text);
     let voices = window.speechSynthesis.getVoices();
-    // Choose a male voice, fallback to default
-    msg.voice = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('male')) || voices[0];
-    msg.rate = 1;
-    msg.pitch = 1;
+
+    // Try to pick a deep male voice reliably
+    msg.voice = voices.find(v => v.lang.startsWith('en') && /male|english/i.test(v.name)) || voices[0];
+
+    msg.rate = 1;    // normal speed
+    msg.pitch = 0.8; // slightly lower pitch for deeper voice
     msg.volume = 1;
     msg.text = text;
     window.speechSynthesis.speak(msg);
@@ -98,7 +100,7 @@ function callEmergency() {
     window.location.href = `tel:${caretakerNumber}`;
 }
 
-// --- Location Feature with Human-readable Address ---
+// --- Location Feature with Street/Area/Landmark ---
 async function tellLocation() {
     if (!navigator.geolocation) return speak("Geolocation is not supported by your browser.");
 
@@ -107,7 +109,7 @@ async function tellLocation() {
         let lon = position.coords.longitude;
 
         try {
-            // Use OpenStreetMap Nominatim API for reverse geocoding
+            // Reverse geocoding via OpenStreetMap Nominatim
             let res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
             let data = await res.json();
             let address = data.address || {};
@@ -115,7 +117,9 @@ async function tellLocation() {
             let suburb = address.suburb || '';
             let city = address.city || address.town || address.village || '';
             let landmark = address.building || address.house || address.neighbourhood || '';
-            let spoken = `Your current location is in ${suburb ? suburb + ', ' : ''}${city}. Closest street or landmark is ${street || landmark}.`;
+
+            let spoken = `You are currently in ${suburb ? suburb + ', ' : ''}${city}`;
+            if (street || landmark) spoken += `. Closest street or landmark is ${street || landmark}`;
             speak(spoken);
         } catch (err) {
             console.error(err);
