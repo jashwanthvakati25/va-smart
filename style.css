@@ -1,0 +1,72 @@
+/* Import Brush Hand New font */
+@import url('https://fonts.cdnfonts.com/css/brush-hand-new');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    background-color: #36221B; /* Dark Chocolate Brown – Background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 30px;
+    font-family: 'Brush Hand New', sans-serif;
+    color: #A67C52; /* Tan – Text */
+    padding: 20px;
+}
+
+#logo {
+    width: 21vw;
+}
+
+h1 {
+    color: #A67C52;
+    font-family: 'Brush Hand New', sans-serif;
+    text-align: center;
+}
+
+#name, #va {
+    color: #A67C52;
+    font-size: 50px;
+    font-family: 'Brush Hand New', sans-serif;
+}
+
+#voice {
+    width: 200px;
+    display: none;
+}
+
+#btn, #connectBtn {
+    width: 50%;
+    background: linear-gradient(to right, #8B3E1E, #8B3E1E);
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    font-size: 25px;
+    font-family: 'Brush Hand New', sans-serif;
+    border-radius: 25px;
+    box-shadow: 3px 3px 12px #3D3D3D;
+    border: none;
+    transition: 0.5s;
+    cursor: pointer;
+    color: #36221B;
+    position: relative;
+    z-index: 10; /* Ensure on top */
+}
+
+#btn:hover, #connectBtn:hover {
+    box-shadow: 3px 3px 22px #3D3D3D;
+    letter-spacing: 5px;
+}
+
+h2, p, span {
+    color: #A67C52;
+}

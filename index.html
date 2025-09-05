@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Healix - Your Health Assistant</title>
+  <link rel="shortcut icon" href="Avatar.png?v=2" type="image/x-icon">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#8B3E1E">
+  <style>
+    /* Inline styles for header layout */
+    #header {
+      text-align: center;
+      margin-top: 20px;
+    }
+    #name {
+      font-size: 60px; /* Big letters for Healix */
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+      color: #A67C52;
+    }
+    #va {
+      font-size: 22px; /* Smaller letters for motto */
+      display: block;
+      color: #A67C52;
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <img src="Avatar.png?v=2" alt="Avatar" id="logo">
+    <span id="name">Healix</span>
+    <span id="va">Guiding your health, every step of the way</span>
+  </div>
+
+  <img src="voice.gif" alt="voice" id="voice" />
+
+  <button id="btn"><img src="mic.svg" alt="mic"><span id="content">Press to interact</span></button>
+  <button id="connectBtn">🔌 Connect to Arduino</button>
+  <p id="output">Waiting for temperature data...</p>
+
+  <script src="script.js"></script>
+
+  <!-- Register Service Worker for PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('Service Worker registered ✅', reg))
+          .catch(err => console.log('Service Worker registration failed ❌', err));
+      });
+    }
+  </script>
+</body>
+</html>

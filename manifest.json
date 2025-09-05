@@ -1,0 +1,20 @@
+{
+  "name": "Iris - Virtual Assistant",
+  "short_name": "Iris",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#36221B",
+  "theme_color": "#8B3E1E",
+  "icons": [
+    {
+      "src": "Avatar.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "Avatar.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
