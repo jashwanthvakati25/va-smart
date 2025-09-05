@@ -5,10 +5,11 @@ let connectBtn;
 let device, obstacleChar;
 let reconnectInterval;
 
-// --- Speak Function (Normal male voice) ---
+// --- Speak Function (Male voice) ---
 function speak(text) {
     let msg = new SpeechSynthesisUtterance(text);
     let voices = window.speechSynthesis.getVoices();
+    // Choose a male voice, fallback to default
     msg.voice = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('male')) || voices[0];
     msg.rate = 1;
     msg.pitch = 1;
@@ -38,9 +39,7 @@ recognition.onresult = (event) => {
     takeCommand(transcript.toLowerCase());
 };
 
-btn.addEventListener("click", () => {
-    recognition.start();
-});
+btn.addEventListener("click", () => recognition.start());
 
 // --- Connect to Arduino via BLE ---
 async function connectArduino() {
@@ -49,21 +48,15 @@ async function connectArduino() {
             filters: [{ name: "SmartCane" }],
             optionalServices: ["12345678-1234-5678-1234-56789abcdef0"]
         });
-
         device.addEventListener('gattserverdisconnected', handleDisconnect);
-
         const server = await device.gatt.connect();
         const service = await server.getPrimaryService("12345678-1234-5678-1234-56789abcdef0");
         obstacleChar = await service.getCharacteristic("abcdefab-1234-5678-1234-56789abcdef0");
-
         await obstacleChar.startNotifications();
         obstacleChar.addEventListener("characteristicvaluechanged", handleObstacleNotification);
-
         speak("Connection to Smart Cane established successfully.");
         console.log("Connected ✅");
-
         if (reconnectInterval) clearInterval(reconnectInterval);
-
     } catch (err) {
         console.error("Connection failed:", err);
         speak("Connection failed, please try again.");
@@ -81,7 +74,6 @@ function handleObstacleNotification(event) {
 function handleDisconnect() {
     console.warn("Smart Cane disconnected!");
     speak("Smart Cane disconnected. Attempting to reconnect.");
-
     reconnectInterval = setInterval(async () => {
         try {
             if (!device) return;
@@ -90,51 +82,56 @@ function handleDisconnect() {
             obstacleChar = await service.getCharacteristic("abcdefab-1234-5678-1234-56789abcdef0");
             await obstacleChar.startNotifications();
             obstacleChar.addEventListener("characteristicvaluechanged", handleObstacleNotification);
-
             speak("Reconnected to Smart Cane successfully.");
             console.log("Reconnected ✅");
-
             clearInterval(reconnectInterval);
-
         } catch (err) {
             console.warn("Reconnect attempt failed:", err);
         }
     }, 5000);
 }
 
-// --- Emergency Function (opens dialer on mobile) ---
+// --- Emergency Function ---
 function callEmergency() {
     let caretakerNumber = "584782659";
     speak("Calling your caretaker.");
     window.location.href = `tel:${caretakerNumber}`;
 }
 
-// --- Location Feature ---
-function tellLocationAndNearby() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(position => {
-            let lat = position.coords.latitude;
-            let lon = position.coords.longitude;
-            speak(`Your current location is latitude ${lat.toFixed(3)}, longitude ${lon.toFixed(3)}. Opening nearby hospitals on Google Maps.`);
-            window.open(`https://www.google.com/maps/search/hospitals/@${lat},${lon},15z`);
-        }, error => {
-            console.error(error);
-            speak("Sorry, I couldn't get your location.");
-        }, {
-            enableHighAccuracy: false,
-            timeout: 5000,
-            maximumAge: 0
-        });
-    } else {
-        speak("Geolocation is not supported by your browser.");
-    }
+// --- Location Feature with Human-readable Address ---
+async function tellLocation() {
+    if (!navigator.geolocation) return speak("Geolocation is not supported by your browser.");
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        let lat = position.coords.latitude;
+        let lon = position.coords.longitude;
+
+        try {
+            // Use OpenStreetMap Nominatim API for reverse geocoding
+            let res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+            let data = await res.json();
+            let address = data.address || {};
+            let street = address.road || address.pedestrian || '';
+            let suburb = address.suburb || '';
+            let city = address.city || address.town || address.village || '';
+            let landmark = address.building || address.house || address.neighbourhood || '';
+            let spoken = `Your current location is in ${suburb ? suburb + ', ' : ''}${city}. Closest street or landmark is ${street || landmark}.`;
+            speak(spoken);
+        } catch (err) {
+            console.error(err);
+            speak(`Your coordinates are latitude ${lat.toFixed(3)}, longitude ${lon.toFixed(3)}`);
+        }
+    }, (error) => {
+        console.error(error);
+        speak("Sorry, I couldn't get your location.");
+    }, { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 });
 }
 
 // --- Go to Home Function ---
 function goHome() {
     speak("Location set to home.");
-    const homeLat = 24.663583; // 24°39'48.9"N
-    const homeLon = 46.7065;   // 46°42'23.4"E
+    const homeLat = 24.663583;
+    const homeLon = 46.7065;
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${homeLat},${homeLon}`);
 }
 
@@ -156,7 +153,7 @@ function takeCommand(message) {
         connectArduino();
     }
     else if (message.includes("emergency") || message.includes("help")) callEmergency();
-    else if (message.includes("location") || message.includes("nearby")) tellLocationAndNearby();
+    else if (message.includes("location") || message.includes("nearby")) tellLocation();
     else if (message.includes("home")) goHome();
     else {
         let varSearch = "https://www.google.com/search?q=" + message;

@@ -10,23 +10,75 @@
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B3E1E">
+
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fefcf6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
     #header {
       text-align: center;
       margin-top: 20px;
     }
+
     #name {
       font-size: 60px;
       font-weight: bold;
+      color: #A67C52;
       display: block;
       margin-bottom: 5px;
-      color: #A67C52;
     }
+
     #va {
       font-size: 22px;
-      display: block;
       color: #A67C52;
+      display: block;
       margin-top: 0;
+    }
+
+    #logo {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+    }
+
+    #voice {
+      width: 100px;
+      margin: 20px 0;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      margin: 10px 0;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      background-color: #A67C52;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #8b5e3c;
+    }
+
+    #content {
+      font-size: 16px;
     }
   </style>
 </head>
@@ -37,13 +89,18 @@
     <span id="va">Guiding your health, every step of the way</span>
   </div>
 
-  <img src="voice.gif" alt="voice" id="voice" />
+  <img src="voice.gif" alt="voice" id="voice">
 
-  <button id="btn"><img src="mic.svg" alt="mic"><span id="content">Press to interact</span></button>
+  <button id="btn">
+    <img src="mic.svg" alt="mic" width="24" height="24">
+    <span id="content">Press to interact</span>
+  </button>
+
   <button id="connectBtn">🔌 Connect to Arduino</button>
 
   <script src="script.js"></script>
 
+  <!-- Register Service Worker for PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
